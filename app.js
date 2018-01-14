@@ -4,6 +4,7 @@
 const
 	express = require('express'),
 	bodyParser = require('body-parser'),
+	request = require('request'),
 	app = express().use(bodyParser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -26,10 +27,13 @@ app.post('/webhook', (req, res) => {
 
 			// Gets the message. entry.messaging is an array, but 
 			// will only ever contain one message, so we get index 0
-			let webhook_event = entry.messaging[0];
-			console.log(webhook_event);
+			entry.messaging.forEach((event) => {
+				if (event.message && event.message.text) {
+					sendMessage(event);
+				}
+			});
+			console.log(entry);
 		});
-
 		// Returns a '200 OK' response to all requests
 		res.status(200).send('EVENT_RECEIVED');
 	} else {
@@ -66,3 +70,30 @@ app.get('/webhook', (req, res) => {
 		}
 	} else res.status(404).send("Request not found");
 });
+
+function sendMessage(event) {
+	let sender = event.sender.id;
+	let text = event.message.text;
+
+	request({
+		url: 'https://graph.facebook.com/v2.6/me/messages',
+		qs: {
+			access_token: 'EAAZAn1fUAdrYBAFhv9Fjb11QgSQWnw0bVpZBIIsYZAfCsADr4cYDN0TXaIXrN0cU3J7oKZA9bW9JgOp2R8GrFSVHxIFvk9pWFuzLcw1a3gZCJ0bg2YAKmrPquAP2F6wez2OVCmCAJn7wxpUOLo2QOZAS70LYYugoowITqZCBVQkx1x7yBDGaDzJ'
+		},
+		method: 'POST',
+		json: {
+			recipient: {
+				id: sender
+			},
+			message: {
+				text: text
+			}
+		}
+	}, function(error, response) {
+		if (error) {
+			console.log('Error sending message: ', error);
+		} else if (response.body.error) {
+			console.log('Error: ', response.body.error);
+		}
+	});
+}
