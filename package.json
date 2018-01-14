@@ -1,0 +1,30 @@
+{
+  "name": "gsduong-weatherbot",
+  "version": "1.0.0",
+  "description": "Graduation Research II",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gsduong/weather-chatbot.git"
+  },
+  "keywords": [
+    "weather-chatbot",
+    "api.ai",
+    "nodejs",
+    "webhook"
+  ],
+  "author": "gsduong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gsduong/weather-chatbot/issues"
+  },
+  "homepage": "https://github.com/gsduong/weather-chatbot#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
+  }
+}
