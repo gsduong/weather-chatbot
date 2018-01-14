@@ -5,6 +5,7 @@ const
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	request = require('request'),
+	apiaiApp = require('apiai')('ffe516c82504460f9cfcda9bf3b14b29'),
 	app = express().use(bodyParser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -75,6 +76,48 @@ function sendMessage(event) {
 	let sender = event.sender.id;
 	let text = event.message.text;
 
+	let apiai = apiaiApp.textRequest(text, {
+		sessionId: 'tabby_cat' // use any arbitrary id
+	});
+
+	apiai.on('response', (response) => {
+		let aiText = response.result.fulfillment.speech;
+
+		request({
+			url: 'https://graph.facebook.com/v2.6/me/messages',
+			qs: {
+				access_token: 'EAAZAn1fUAdrYBAFhv9Fjb11QgSQWnw0bVpZBIIsYZAfCsADr4cYDN0TXaIXrN0cU3J7oKZA9bW9JgOp2R8GrFSVHxIFvk9pWFuzLcw1a3gZCJ0bg2YAKmrPquAP2F6wez2OVCmCAJn7wxpUOLo2QOZAS70LYYugoowITqZCBVQkx1x7yBDGaDzJ'
+			},
+			method: 'POST',
+			json: {
+				recipient: {
+					id: sender
+				},
+				message: {
+					text: aiText
+				}
+			}
+		}, (error, response) => {
+			if (error) {
+				console.log('Error sending message: ', error);
+			} else if (response.body.error) {
+				console.log('Error: ', response.body.error);
+			}
+		});
+	});
+
+	apiai.on('error', (error) => {
+		console.log(error);
+	});
+
+	apiai.end();
+}
+
+/*
+function sendMessage(event) {
+	let sender = event.sender.id;
+	let text = event.message.text;
+
 	request({
 		url: 'https://graph.facebook.com/v2.6/me/messages',
 		qs: {
@@ -96,4 +139,4 @@ function sendMessage(event) {
 			console.log('Error: ', response.body.error);
 		}
 	});
-}
+} */
