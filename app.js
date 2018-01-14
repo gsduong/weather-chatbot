@@ -113,30 +113,64 @@ function sendMessage(event) {
 	apiai.end();
 }
 
-/*
-function sendMessage(event) {
-	let sender = event.sender.id;
-	let text = event.message.text;
 
-	request({
-		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {
-			access_token: 'EAAZAn1fUAdrYBAFhv9Fjb11QgSQWnw0bVpZBIIsYZAfCsADr4cYDN0TXaIXrN0cU3J7oKZA9bW9JgOp2R8GrFSVHxIFvk9pWFuzLcw1a3gZCJ0bg2YAKmrPquAP2F6wez2OVCmCAJn7wxpUOLo2QOZAS70LYYugoowITqZCBVQkx1x7yBDGaDzJ'
-		},
-		method: 'POST',
-		json: {
-			recipient: {
-				id: sender
-			},
-			message: {
-				text: text
+/* Webhook for API.ai to get response from the 3rd party API */
+app.post('/ai', (req, res) => {
+			console.log('*** Webhook for api.ai query ***');
+			console.log(req.body.result);
+
+			if (req.body.result.action === 'weather') {
+				console.log('*** weather ***');
+				let city = req.body.result.parameters['geo-city'];
+				let restUrl = 'http://api.openweathermap.org/data/2.5/weather?APPID=' + '0bc08e8a86a77b3da8d772a3031d8cc8' + '&q=' + city;
+
+				request.get(restUrl, (err, response, body) => {
+					if (!err && response.statusCode == 200) {
+						let json = JSON.parse(body);
+						console.log(json);
+						let tempF = ~~(json.main.temp * 9 / 5 - 459.67);
+						let tempC = ~~(json.main.temp - 273.15);
+						let msg = 'The current condition in ' + json.name + ' is ' + json.weather[0].description + ' and the temperature is ' + tempF + ' ℉ (' + tempC + ' ℃).'
+						return res.json({
+							speech: msg,
+							displayText: msg,
+							source: 'weather'
+						});
+					} else {
+						let errorMessage = 'I failed to look up the city name.';
+						return res.status(400).json({
+							status: {
+								code: 400,
+								errorType: errorMessage
+							}
+						});
+					}
+				})
 			}
-		}
-	}, function(error, response) {
-		if (error) {
-			console.log('Error sending message: ', error);
-		} else if (response.body.error) {
-			console.log('Error: ', response.body.error);
-		}
-	});
-} */
+			/*
+			function sendMessage(event) {
+				let sender = event.sender.id;
+				let text = event.message.text;
+
+				request({
+					url: 'https://graph.facebook.com/v2.6/me/messages',
+					qs: {
+						access_token: 'EAAZAn1fUAdrYBAFhv9Fjb11QgSQWnw0bVpZBIIsYZAfCsADr4cYDN0TXaIXrN0cU3J7oKZA9bW9JgOp2R8GrFSVHxIFvk9pWFuzLcw1a3gZCJ0bg2YAKmrPquAP2F6wez2OVCmCAJn7wxpUOLo2QOZAS70LYYugoowITqZCBVQkx1x7yBDGaDzJ'
+					},
+					method: 'POST',
+					json: {
+						recipient: {
+							id: sender
+						},
+						message: {
+							text: text
+						}
+					}
+				}, function(error, response) {
+					if (error) {
+						console.log('Error sending message: ', error);
+					} else if (response.body.error) {
+						console.log('Error: ', response.body.error);
+					}
+				});
+			} */
