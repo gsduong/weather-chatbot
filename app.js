@@ -5,7 +5,7 @@ const
 	express = require('express'),
 	bodyParser = require('body-parser'),
 	request = require('request'),
-	apiaiApp = require('apiai')('ffe516c82504460f9cfcda9bf3b14b29'),
+	apiaiApp = require('apiai')('ffe516c82504460f9cfcda9bf3b14b29'), // after sigup api.ai and create agent, you will get client_access_token
 	app = express().use(bodyParser.json()); // creates express http server
 
 // Sets server port and logs message on success
@@ -86,7 +86,7 @@ function sendMessage(event) {
 		request({
 			url: 'https://graph.facebook.com/v2.6/me/messages',
 			qs: {
-				access_token: 'EAAZAn1fUAdrYBAFhv9Fjb11QgSQWnw0bVpZBIIsYZAfCsADr4cYDN0TXaIXrN0cU3J7oKZA9bW9JgOp2R8GrFSVHxIFvk9pWFuzLcw1a3gZCJ0bg2YAKmrPquAP2F6wez2OVCmCAJn7wxpUOLo2QOZAS70LYYugoowITqZCBVQkx1x7yBDGaDzJ'
+				access_token: 'EAAZAn1fUAdrYBAFhv9Fjb11QgSQWnw0bVpZBIIsYZAfCsADr4cYDN0TXaIXrN0cU3J7oKZA9bW9JgOp2R8GrFSVHxIFvk9pWFuzLcw1a3gZCJ0bg2YAKmrPquAP2F6wez2OVCmCAJn7wxpUOLo2QOZAS70LYYugoowITqZCBVQkx1x7yBDGaDzJ' // pace access token
 			},
 			method: 'POST',
 			json: {
@@ -122,7 +122,7 @@ app.post('/ai', (req, res) => {
 	if (req.body.result.action === 'weather') {
 		console.log('*** weather ***');
 		let city = req.body.result.parameters['geo-city'];
-		let restUrl = 'http://api.openweathermap.org/data/2.5/weather?APPID=' + '0bc08e8a86a77b3da8d772a3031d8cc8' + '&q=' + city;
+		let restUrl = 'http://api.openweathermap.org/data/2.5/weather?APPID=' + '0bc08e8a86a77b3da8d772a3031d8cc8' + '&q=' + city; // prefined api access token, no need to change
 
 		request.get(restUrl, (err, response, body) => {
 			if (!err && response.statusCode == 200) {
@@ -148,30 +148,3 @@ app.post('/ai', (req, res) => {
 		})
 	}
 });
-/*
-function sendMessage(event) {
-	let sender = event.sender.id;
-	let text = event.message.text;
-
-	request({
-		url: 'https://graph.facebook.com/v2.6/me/messages',
-		qs: {
-			access_token: 'EAAZAn1fUAdrYBAFhv9Fjb11QgSQWnw0bVpZBIIsYZAfCsADr4cYDN0TXaIXrN0cU3J7oKZA9bW9JgOp2R8GrFSVHxIFvk9pWFuzLcw1a3gZCJ0bg2YAKmrPquAP2F6wez2OVCmCAJn7wxpUOLo2QOZAS70LYYugoowITqZCBVQkx1x7yBDGaDzJ'
-		},
-		method: 'POST',
-		json: {
-			recipient: {
-				id: sender
-			},
-			message: {
-				text: text
-			}
-		}
-	}, function(error, response) {
-		if (error) {
-			console.log('Error sending message: ', error);
-		} else if (response.body.error) {
-			console.log('Error: ', response.body.error);
-		}
-	});
-} */
