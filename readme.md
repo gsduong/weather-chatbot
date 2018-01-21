@@ -29,5 +29,5 @@ Then, at the Webhooks, (3) click the Setup Webhooks button:
 
 In the dialog, fill out the (1) Callback URL with your heroku URL (/webhook), (2) the random string for validation: type "TOKEN"
 ![Verify And Save](https://github.com/gsduong/weather-chatbot/blob/master/6.png)
-
+(Verify Token = "TOKEN")
 Go to your page and enjoy!
